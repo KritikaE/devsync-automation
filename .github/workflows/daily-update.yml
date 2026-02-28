@@ -1,0 +1,36 @@
+name: Daily Repository Update
+
+on:
+  # This is the schedule trigger — like setting an alarm clock
+  # Cron format: minute hour day month weekday
+  # "30 2 * * *" means: at 2:30 AM UTC, every day
+  schedule:
+    - cron: '30 2 * * *'
+  
+  # This lets you manually trigger it too (for testing!)
+  workflow_dispatch:
+
+jobs:
+  daily-commit:
+    runs-on: ubuntu-latest   # Use GitHub's Linux computer
+
+    steps:
+      # Step 1: Download your repo onto GitHub's computer
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: This is the required step with YOUR email in the name
+      - name: Update log for 24f2000844@ds.study.iitm.ac.in
+        run: |
+          # Create or update a log file with today's date and time
+          echo "Daily update: $(date '+%Y-%m-%d %H:%M:%S UTC')" >> update-log.txt
+          echo "Automated commit by DevSync workflow" >> update-log.txt
+
+      # Step 3: Commit and push the changes back to your repo
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add update-log.txt
+          git commit -m "chore: daily automated update $(date '+%Y-%m-%d')"
+          git push
